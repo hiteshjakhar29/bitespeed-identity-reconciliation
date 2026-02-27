@@ -1,8 +1,10 @@
 import express from "express";
 import { handleIdentify } from "./identify";
+import { requestLogger } from "./logger";
 
 const app = express();
 app.use(express.json());
+app.use(requestLogger);
 
 // health check — handy when deploying
 app.get("/", (_req, res) => {
