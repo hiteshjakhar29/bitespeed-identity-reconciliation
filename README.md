@@ -81,3 +81,34 @@ src/
 prisma/
   schema.prisma → Database schema
 ```
+ 
+echo '
+## Live Endpoint
+
+The service is hosted at: https://bitespeed-identity-3z16.onrender.com/identify
+
+### Test it
+````bash
+curl -X POST https://bitespeed-identity-3z16.onrender.com/identify \
+  -H "Content-Type: application/json" \
+  -d '"'"'{"email":"test@example.com","phoneNumber":"12345"}'"'"'
+```' >> README.md
+```
+
+Actually, let me make this cleaner — open the README in a text editor instead:
+```bash
+open README.md
+```
+
+Then scroll to the bottom and add this section:
+````
+## Live Endpoint
+
+The service is hosted at: https://bitespeed-identity-3z16.onrender.com/identify
+
+**Example request:**
+````bash
+curl -X POST https://bitespeed-identity-3z16.onrender.com/identify \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","phoneNumber":"12345"}'
+````
