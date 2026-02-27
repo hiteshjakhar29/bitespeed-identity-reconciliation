@@ -16,25 +16,23 @@ All of this runs inside a database transaction to avoid race conditions.
 
 ### Prerequisites
 - Node.js 18+
-- Docker (for Postgres) or a Postgres instance running somewhere
+- A Postgres database (I used [Neon](https://neon.tech) — free tier, no setup needed)
 
 ### Steps
 
 ```bash
-# 1. spin up postgres
-docker compose up -d
-
-# 2. install dependencies
+# 1. install dependencies
 npm install
 
-# 3. create your .env from the example
+# 2. create your .env and paste your database URL
 cp .env.example .env
+# edit .env → set DATABASE_URL to your Neon connection string
 
-# 4. generate prisma client + run migration
+# 3. generate prisma client + run migration
 npx prisma generate
 npx prisma migrate dev --name init
 
-# 5. start the dev server
+# 4. start the dev server
 npm run dev
 ```
 
@@ -68,47 +66,51 @@ npm start
 
 - **Runtime:** Node.js + TypeScript
 - **Framework:** Express
-- **Database:** PostgreSQL
+- **Database:** PostgreSQL (hosted on [Neon](https://neon.tech))
 - **ORM:** Prisma
+- **CI/CD:** GitHub Actions
 
 ## Project structure
 
 ```
 src/
-  index.ts      → Express server, route handler
-  identify.ts   → Core reconciliation logic
-  prisma.ts     → Prisma client instance
+  index.ts        → Express server, route handler
+  identify.ts     → Core reconciliation logic
+  prisma.ts       → Prisma client instance
 prisma/
-  schema.prisma → Database schema
-```
- 
-echo '
-## Live Endpoint
-
-The service is hosted at: https://bitespeed-identity-3z16.onrender.com/identify
-
-### Test it
-````bash
-curl -X POST https://bitespeed-identity-3z16.onrender.com/identify \
-  -H "Content-Type: application/json" \
-  -d '"'"'{"email":"test@example.com","phoneNumber":"12345"}'"'"'
-```' >> README.md
+  schema.prisma   → Database schema
+  seed.ts         → Seed script with sample data from the assignment
+tests/
+  identify.test.ts → Integration tests covering all scenarios
+postman/
+  Bitespeed_Identity.postman_collection.json → Ready-to-import Postman collection
+.github/
+  workflows/
+    ci.yml        → CI pipeline (type check + build)
 ```
 
-Actually, let me make this cleaner — open the README in a text editor instead:
+## Seed the database
+
+Pre-populate the database with the sample data from the assignment:
+
 ```bash
-open README.md
+npm run seed
 ```
 
-Then scroll to the bottom and add this section:
-````
+## Run tests
+
+Make sure the server is running in one terminal (`npm run dev`), then in another:
+
+```bash
+npm test
+```
+
+This runs integration tests against all scenarios — new customer, secondary creation, phone/email-only queries, merging primaries, duplicate handling, and error cases.
+
+## Postman collection
+
+Import `postman/Bitespeed_Identity.postman_collection.json` into Postman. It has pre-configured requests for every scenario. Update the `baseUrl` variable to point to your local or deployed instance.
+
 ## Live Endpoint
 
 The service is hosted at: https://bitespeed-identity-3z16.onrender.com/identify
-
-**Example request:**
-````bash
-curl -X POST https://bitespeed-identity-3z16.onrender.com/identify \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","phoneNumber":"12345"}'
-````
