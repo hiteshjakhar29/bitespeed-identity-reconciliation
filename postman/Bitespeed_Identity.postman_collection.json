@@ -1,0 +1,192 @@
+{
+  "info": {
+    "name": "Bitespeed Identity Reconciliation",
+    "description": "Test collection for the /identify endpoint. Covers all scenarios: new customer, secondary creation, phone/email-only queries, and merging two primaries.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. New Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"lorraine@hillvalley.edu\",\n  \"phoneNumber\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "First request — no matches exist, creates a new primary contact."
+      }
+    },
+    {
+      "name": "2. Same Phone, New Email (Secondary)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"mcfly@hillvalley.edu\",\n  \"phoneNumber\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "Same phone as contact #1, but new email. Should create a secondary contact."
+      }
+    },
+    {
+      "name": "3. Query by Phone Only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phoneNumber\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "Query with only phone — should return consolidated contact with both emails."
+      }
+    },
+    {
+      "name": "4. Query by Email Only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"mcfly@hillvalley.edu\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "Query with only email — should return the same consolidated contact."
+      }
+    },
+    {
+      "name": "5. Create Separate Customer (George)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"george@hillvalley.edu\",\n  \"phoneNumber\": \"919191\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "Creates a new independent primary contact."
+      }
+    },
+    {
+      "name": "6. Create Another Separate Customer (Biff)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"biffsucks@hillvalley.edu\",\n  \"phoneNumber\": \"717171\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "Creates another independent primary contact."
+      }
+    },
+    {
+      "name": "7. Merge Two Primaries",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"george@hillvalley.edu\",\n  \"phoneNumber\": \"717171\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "George's email + Biff's phone — bridges two primaries. Older one stays primary, newer becomes secondary."
+      }
+    },
+    {
+      "name": "8. Empty Request (400 Error)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        },
+        "description": "No email or phone — should return 400 error."
+      }
+    }
+  ]
+}
